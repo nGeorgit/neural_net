@@ -63,7 +63,7 @@ class Neural:
         biasDeriv: list[np.ndarray] = []
         for i in self.nodeLayers:
             biasDeriv.append(np.zeros(i.shape))
-
+        cost = 0
         for i in range(len(trainInputs)):
             #trainInputs[i] = [1,1] #DELETE
             activationMatrix, zMatrix = self.runGetActivationMatrixAndZMatrix(trainInputs[i])
@@ -80,6 +80,7 @@ class Neural:
             
             #trainExpOut[i] = [1,0] #DELETE
             activationDerivMat[-1] = 2*(activationMatrix[-1] - trainExpOut[i])
+            cost += np.sum((activationMatrix[-1] - trainExpOut[i])**2)
 
             biasDerivOfTrain[-1] = sigmoidDeriv(zMatrix[-1])*activationDerivMat[-1]
             for j in range(len(weightDeriv[-1][0])):
@@ -112,11 +113,10 @@ class Neural:
         for i in range(self.size):
             self.weightLayers[i] -= weightDeriv[i]*step
             self.nodeLayers[i] -= biasDeriv[i]*step
+        
+        return cost/len(trainInputs)
 
 
-
-
-            
 
     def print_nodeLayers(self) -> None:
         for v in self.nodeLayers: pprint(v)
